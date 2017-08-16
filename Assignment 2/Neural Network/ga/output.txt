@@ -1,0 +1,8 @@
+GA:
+
+
+mean elapsed time for 1 run: 2686.467
+mean f-evals: 70200
+average f-val: 0.054769
+best f-val: 0.059006
+performance f-val: 0.94421

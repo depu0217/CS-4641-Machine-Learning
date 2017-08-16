@@ -1,0 +1,8 @@
+Simulated Annealing:
+
+
+mean elapsed time for 1 run: 147.753
+mean f-evals: 4001
+average f-val: 0.050516
+best f-val: 0.049903
+performance f-val: 0.94421

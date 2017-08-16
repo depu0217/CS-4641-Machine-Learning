@@ -1,0 +1,62 @@
+=== Run information ===
+
+Evaluator:    weka.attributeSelection.PrincipalComponents -R 0.95 -A 5
+Search:       weka.attributeSelection.Ranker -T -1.7976931348623157E308 -N -1
+Relation:     car-evaluation
+Instances:    1728
+Attributes:   7
+              V1
+              V2
+              V3
+              V4
+              V5
+              V6
+              Class
+Evaluation mode:    evaluate on all training data
+
+
+
+=== Attribute Selection on all input data ===
+
+Search Method:
+	Attribute ranking.
+
+Attribute Evaluator (unsupervised):
+	Principal Components Attribute Transformer
+
+Correlation matrix
+  1      0     -0     -0     -0      0    
+  0      1     -0      0     -0      0    
+ -0     -0      1     -0      0      0    
+ -0      0     -0      1     -0     -0    
+ -0     -0      0     -0      1     -0    
+  0      0      0     -0     -0      1    
+
+
+eigenvalue	proportion	cumulative
+  1      	  0.16667	  0.16667	-1V3+0.022V2+0.005V1-0.003V4-0.002V5...
+  1      	  0.16667	  0.33333	1    V1-0.021V2-0.005V5+0.004V3+0.002V4...
+  1      	  0.16667	  0.5    	1    V2+0.023V3+0.021V1+0.003V4+0.002V5...
+  1      	  0.16667	  0.66667	0.806V5-0.593V4+0.005V1+0.001V6+0    V2...
+  1      	  0.16667	  0.83333	-0.805V4-0.593V5+0.008V6+0.004V3+0.004V2...
+  1      	  0.16667	  1      	1    V6+0.007V4+0.004V5-0V2-0V3...
+
+Eigenvectors
+ V1	 V2	 V3	 V4	 V5	 V6	
+ 0.0046	 0.9998	 0.0213	 0.0049	-0.0012	-0     	V1
+ 0.0225	-0.0214	 0.9995	 0.0001	 0.0036	-0.0003	V2
+-0.9997	 0.0041	 0.0225	-0     	 0.0038	-0.0001	V3
+-0.0029	 0.0019	 0.0031	-0.5925	-0.8055	 0.0066	V4
+-0.0022	-0.0047	 0.002 	 0.8055	-0.5925	 0.0039	V5
+-0.0001	 0     	 0.0002	 0.0007	 0.0076	 1     	V6
+
+Ranked attributes:
+ 0.8333333333333306    1 -1V3+0.022V2+0.005V1-0.003V4-0.002V5...
+ 0.6666666666666619    2 1    V1-0.021V2-0.005V5+0.004V3+0.002V4...
+ 0.4999999999999931    3 1    V2+0.023V3+0.021V1+0.003V4+0.002V5...
+ 0.3333333333333286    4 0.806V5-0.593V4+0.005V1+0.001V6+0    V2...
+ 0.16666666666666408   5 -0.805V4-0.593V5+0.008V6+0.004V3+0.004V2...
+-0.000000000000000222  6 1    V6+0.007V4+0.004V5-0V2-0V3...
+
+Selected attributes: 1,2,3,4,5,6 : 6
+

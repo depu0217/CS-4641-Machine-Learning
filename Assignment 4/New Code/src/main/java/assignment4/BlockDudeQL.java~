@@ -1,0 +1,136 @@
+import burlap.behavior.learningrate.SoftTimeInverseDecayLR;
+import burlap.behavior.policy.EpsilonGreedy;
+import burlap.behavior.policy.Policy;
+import burlap.behavior.singleagent.EpisodeAnalysis;
+import burlap.behavior.singleagent.auxiliary.EpisodeSequenceVisualizer;
+import burlap.behavior.singleagent.auxiliary.StateReachability;
+import burlap.behavior.singleagent.auxiliary.valuefunctionvis.ValueFunctionVisualizerGUI;
+import burlap.behavior.singleagent.learning.tdmethods.QLearning;
+import burlap.behavior.singleagent.learning.tdmethods.SarsaLam;
+import burlap.behavior.valuefunction.ValueFunctionInitialization;
+import burlap.domain.singleagent.blockdude.BlockDude;
+import burlap.domain.singleagent.blockdude.BlockDudeLevelConstructor;
+import burlap.domain.singleagent.blockdude.BlockDudeTF;
+import burlap.domain.singleagent.blockdude.BlockDudeVisualizer;
+import burlap.domain.singleagent.gridworld.GridWorldDomain;
+import burlap.domain.singleagent.gridworld.GridWorldTerminalFunction;
+import burlap.domain.singleagent.pomdp.tiger.TigerDomain;
+import burlap.oomdp.auxiliary.stateconditiontest.TFGoalCondition;
+import burlap.oomdp.core.Domain;
+import burlap.oomdp.core.TerminalFunction;
+import burlap.oomdp.core.states.State;
+import burlap.oomdp.singleagent.RewardFunction;
+import burlap.oomdp.singleagent.SADomain;
+import burlap.oomdp.singleagent.common.GoalBasedRF;
+import burlap.oomdp.singleagent.environment.SimulatedEnvironment;
+import burlap.oomdp.statehashing.SimpleHashableStateFactory;
+import burlap.oomdp.visualizer.Visualizer;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Scanner;
+
+public class BlockDudeQL {
+    public static void main(String [] args) throws IOException {
+        System.out.println("Which level do you want to select?\n1. easy\n2. hard");
+        Scanner reader = new Scanner(System.in);
+        BlockDude bd = new BlockDude();
+
+        Domain domain = bd.generateDomain();
+
+        State s = BlockDudeLevelConstructor.getLevel1(domain);
+        String mode = "E";
+
+        if( reader.nextInt() == 2 )
+        {
+            s = BlockDudeLevelConstructor.getLevel3(domain);
+            mode = "H";
+        }
+
+        System.out.println("What's the termination reward?");
+        final double tr = reader.nextDouble();
+
+        System.out.println("What's the step reward?");
+        final double sr = reader.nextDouble();
+
+        TerminalFunction tf = new BlockDudeTF();
+        RewardFunction rf =  new GoalBasedRF(new TFGoalCondition(tf), tr, sr);;
+
+        System.out.println("What's the initial learning rate?");
+
+        double initLR= reader.nextDouble();
+
+        System.out.println("What's the soft factor?");
+
+        int sFactor = reader.nextInt();
+
+        System.out.println("What's the epsilon? ( 0 <= epsilon < 1) ");
+
+        double epsilon = reader.nextDouble();
+
+        final long startTime = System.currentTimeMillis();
+
+        //create environment
+        SimulatedEnvironment env = new SimulatedEnvironment(domain, rf, tf, s);
+
+        System.out.println("What's the number of episodes?");
+        final int numIter = reader.nextInt();
+
+        QLearning ql = new QLearning(domain, 0.95, new SimpleHashableStateFactory(), 0, 0.1);
+        ql.setLearningRateFunction(new SoftTimeInverseDecayLR(initLR, sFactor));
+        ql.setLearningPolicy(new EpsilonGreedy(ql, epsilon));
+        ql.setQInitFunction(new ValueFunctionInitialization.ConstantValueFunctionInitialization());
+
+        ql.initializeForPlanning(rf, tf, numIter);
+        ql.setMaxQChangeForPlanningTerminaiton(1);
+
+        XYSeriesCollection dataset = new XYSeriesCollection( );
+        XYSeries steps = new XYSeries( "Q-Learning with epsilon " + epsilon );
+        for(int i = 0; i < numIter; i++){
+            EpisodeAnalysis tempEa = ql.runLearningEpisode(env, 30000);
+            steps.add(i, tempEa.actionSequence.size());
+            env.resetEnvironment();
+        }
+
+        Policy p = ql.planFromState(s);
+        EpisodeAnalysis ea = p.evaluateBehavior(s, rf, tf);
+
+        final long endTime = System.currentTimeMillis();
+        System.out.println("Steps taken to exit: " + ea.actionSequence.size());
+        System.out.println("Runtime: " + (endTime - startTime) + " milliseconds");
+
+
+        //Create the plot
+        dataset.addSeries(steps);
+
+        JFreeChart xylineChart = ChartFactory.createXYLineChart(
+                "QLearning Steps To Exit With Varied Episodes",
+                "Configurations",
+                "Steps",
+                dataset,
+                PlotOrientation.VERTICAL,
+                true, true, false);
+
+        int width = 640; /* Width of the image */
+        int height = 480; /* Height of the image */
+        File XYChart = new File( "target/generated-sources/BlockDudeQL_" + mode + "_ep" + epsilon + "_p" + sr + ".jpeg" );
+        ChartUtilities.saveChartAsJPEG(XYChart, xylineChart, width, height);
+
+        //Visualize steps
+        List<EpisodeAnalysis> lea = new LinkedList<EpisodeAnalysis>();
+        lea.add(ea);
+
+        Visualizer v = BlockDudeVisualizer.getVisualizer(30, 30);
+        new EpisodeSequenceVisualizer(v, domain, lea);
+    }
+
+}

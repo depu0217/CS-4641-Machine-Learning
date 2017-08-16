@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="Code/src/main/java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/Users/wuwenjun/BURLAP/burlap/target/burlap-3.0.2-SNAPSHOT-jar-with-dependencies.jar"/>
+	<classpathentry kind="output" path="Code/target/classes"/>
+</classpath>

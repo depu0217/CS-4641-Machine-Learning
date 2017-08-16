@@ -1,0 +1,21 @@
+RHC - first sucessfull poll:
+
+
+mean elapsed time for 1 run: 587.8297
+mean f-evals: 151
+average f-val: 0.071231
+best f-val: 0.050482
+performance f-val on test: 0.94421
+performance f-val on training: 0.94686
+
+
+RHC - complete sucessfull poll:
+
+
+mean elapsed time for 1 run: 953.7103
+mean f-evals: 151
+average f-val: 0.049736
+best f-val: 0.049284
+performance f-val on test: 0.94421
+performance f-val on training: 0.94686
+
